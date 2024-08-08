@@ -1,0 +1,4 @@
+sqlmodel~=0.0.21
+pydantic-settings
+pydantic~=2.8.2
+py-trello
