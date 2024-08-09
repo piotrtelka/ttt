@@ -124,7 +124,7 @@ def modify_task_hours(session: Session, hours: int):
     session.commit()
     print(f"Task '{task.name}' now has {task.hours_worked} hours worked.")
 
-def show_current_status(session: Session):
+def show_current_status(client: TrelloClient, session: Session):
     organization = session.exec(select(Organization).where(Organization.is_selected == True)).first()
     board = session.exec(select(Board).where(Board.is_selected == True)).first()
     task = session.exec(select(Task).where(Task.is_selected == True)).first()
@@ -141,6 +141,17 @@ def show_current_status(session: Session):
         print("Board: None")
 
     if task:
-        print(f"Task: {task.name} (Hours worked: {task.hours_worked})")
+        print(f"Task: {task.name}. Hours worked: {task.hours_worked}. Link: https://trello.com/c/{task.trello_id}")
+
+        card = client.get_card(task.trello_id)
+        if card.description and len(card.description) > 0:
+            print("\n--- Task description ---:")
+            print(card.description)
+            print("--- Task comments ---:")
+
+        if len(card.comments) > 0:
+            for comment in card.comments:
+                print(comment)
+                print("-\n")
     else:
         print("Task: None")

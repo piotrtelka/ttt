@@ -57,6 +57,7 @@ def submit_hours_to_trello(session, client):
     trello_card = client.get_card(task.trello_id)
     trello_card.comment(comment)
     print(f"Submitted comment to task '{task.name}': {comment}")
+    print(f"Link: https://trello.com/c/{task.trello_id}")
 
 
 def completer(text, state):
@@ -156,7 +157,7 @@ def main():
             sys.exit(0)
 
         # If no arguments are provided, show the current status
-        show_current_status(session)
+        show_current_status(client, session)
 
 
 if __name__ == "__main__":

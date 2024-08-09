@@ -52,7 +52,7 @@ ttt [OPTIONS] [HOURS]
 
 - Set the current organization:
   ```bash
-  ttt -o "My Organization"
+  ttt -o MyOrg
   ```
 
 - List boards in the current organization:
@@ -62,7 +62,7 @@ ttt [OPTIONS] [HOURS]
 
 - Set the current board:
   ```bash
-  ttt -b "My Board"
+  ttt -b Zadania
   ```
 
 - List tasks in the current board:
@@ -72,7 +72,7 @@ ttt [OPTIONS] [HOURS]
 
 - Set the current task:
   ```bash
-  ttt -t "My Task"
+  ttt -t My_task
   ```
 
 - Add 2 hours to the current task:
@@ -99,19 +99,10 @@ git clone <repository_url>
 cd <repository_name>
 ```
 
-### Install Dependencies
+### Install
 
 ```bash
-pip install -r requirements.txt
-```
-
-### Bash Autocompletion
-
-To enable bash autocompletion, run the install script:
-
-```bash
-chmod +x install_ttt.sh
-./install_ttt.sh
+./install.sh
 ```
 
 This script will:
@@ -143,7 +134,6 @@ The first time you run the script, it will prompt you to obtain a Trello token. 
 - `pydantic`: For settings and validation.
 - `py-trello`: For interacting with the Trello API.
 - `argparse`: For parsing command-line arguments.
-- `readline`: For command-line autocompletion.
 
 ## Database
 
