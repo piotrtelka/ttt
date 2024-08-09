@@ -1,3 +1,4 @@
+from sqlalchemy import text
 from sqlmodel import select
 from src.models import User
 
@@ -21,6 +22,6 @@ def obtain_and_save_token(session, api_key):
     return token
 
 def reset_token(session):
-    session.exec("DELETE FROM user")
+    session.exec(text("DELETE FROM user"))
     session.commit()
     print("Token has been reset.")

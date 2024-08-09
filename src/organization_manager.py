@@ -28,7 +28,6 @@ def fetch_and_store_data(client: TrelloClient, session: Session):
         organization = session.exec(select(Organization).where(Organization.trello_id == trello_org.id)).first()
         if organization:
             organization.name = trello_org.name.replace(' ', '_')
-            organization.is_selected = False  # Reset selection when fetching data
         else:
             organization = Organization(trello_id=trello_org.id, name=trello_org.name.replace(' ', '_'), is_selected=False)
         session.add(organization)
@@ -41,25 +40,26 @@ def fetch_and_store_data(client: TrelloClient, session: Session):
             if board:
                 board.name = trello_board.name.replace(' ', '')
                 board.organization_id = organization.id
-                board.is_selected = False  # Reset selection when fetching data
             else:
                 board = Board(trello_id=trello_board.id, name=trello_board.name.replace(' ', '_'), organization_id=organization.id, is_selected=False)
             session.add(board)
             session.commit()
 
-            # Fetch tasks for each board
-            trello_tasks = trello_board.all_cards()
-            for trello_task in trello_tasks:
-                task = session.exec(select(Task).where(Task.trello_id == trello_task.id)).first()
-                if task:
-                    task.name = trello_task.name.replace(' ', '_')
-                    task.board_id = board.id
-                    task.is_selected = False  # Reset selection when fetching data
-                    task.hours_worked = task.hours_worked  # Assuming hours worked doesn't change from Trello
-                else:
-                    task = Task(trello_id=trello_task.id, name=trello_task.name.replace(' ', '_'), board_id=board.id, is_selected=False, hours_worked=0)
-                session.add(task)
-                session.commit()
+            lists = trello_board.all_lists()
+
+            for trello_list in lists:
+                if 'done' in trello_list.name.lower() or 'billing' in trello_list.name.lower():
+                    continue
+                trello_tasks = trello_list.list_cards()
+                for trello_task in trello_tasks:
+                    task = session.exec(select(Task).where(Task.trello_id == trello_task.id)).first()
+                    if task:
+                        task.name = trello_task.name.replace(' ', '_')
+                        task.board_id = board.id
+                    else:
+                        task = Task(trello_id=trello_task.id, name=trello_task.name.replace(' ', '_'), board_id=board.id, is_selected=False, hours_worked=0)
+                    session.add(task)
+                    session.commit()
 
     print("Fetched and stored all organizations, boards, and tasks.")
 
