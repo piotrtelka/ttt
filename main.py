@@ -81,6 +81,7 @@ def completer(text, state):
 def main():
     parser = argparse.ArgumentParser(description="Trello Time Tracker (ttt)")
     parser.add_argument('-rt', '--reset-token', action='store_true', help="Reset current token")
+    parser.add_argument('-c', '--cleanup', action='store_true', help="Remove tasks that are in billing and done lists")
     parser.add_argument('-lo', '--list-organizations', action='store_true', help="List organizations")
     parser.add_argument('-o', '--organization', type=str, help="Set currently used organization")
     parser.add_argument('-f', '--fetch', action='store_true', help="Fetch all organizations, boards, and tasks from Trello")
@@ -130,6 +131,10 @@ def main():
 
         if args.list_boards:
             list_boards(session)
+            sys.exit(0)
+
+        if args.cleanup:
+            fetch_and_store_data(client, session, cleanup=True)
             sys.exit(0)
 
         if args.board:

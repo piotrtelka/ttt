@@ -21,7 +21,7 @@ def set_current_organization(session: Session, org_name: str):
         print(f"Organization '{org_name}' not found.")
 
 
-def fetch_and_store_data(client: TrelloClient, session: Session):
+def fetch_and_store_data(client: TrelloClient, session: Session, cleanup=False):
     # Fetch organizations
     trello_organizations = client.list_organizations()
     for trello_org in trello_organizations:
@@ -49,6 +49,14 @@ def fetch_and_store_data(client: TrelloClient, session: Session):
 
             for trello_list in lists:
                 if 'done' in trello_list.name.lower() or 'billing' in trello_list.name.lower():
+                    if cleanup:
+                        for trello_task in trello_list.list_cards():
+                            # remove tasks from db:
+                            task = session.exec(select(Task).where(Task.trello_id == trello_task.id)).first()
+                            if task:
+                                print(f"Removing task {task.name} from database. Hours worked: {task.hours_worked}")
+                                session.delete(task)
+                                session.commit()
                     continue
                 trello_tasks = trello_list.list_cards()
                 for trello_task in trello_tasks:
