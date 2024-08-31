@@ -88,14 +88,22 @@ def set_current_board(session: Session, board_name: str):
     else:
         print(f"Board '{board_name}' not found in the selected organization.")
 
-def list_tasks(session: Session):
+def list_tasks(session: Session, show_time=False, worked=False):
     board = session.exec(select(Board).where(Board.is_selected == True)).first()
     if not board:
         print("Error: No board is selected.")
         return
     tasks = session.exec(select(Task).where(Task.board_id == board.id)).all()
-    for task in tasks:
-        print(task.name)
+    if worked:
+        tasks = session.exec(select(Task).where(Task.board_id == board.id).where(Task.hours_worked > 0)).all()
+    if show_time:
+        print("Hours".ljust(11) + "Task")
+        for task in tasks:
+            hours_str = str(task.hours_worked).ljust(10)
+            print(hours_str + " " + task.name)
+    else:
+        for task in tasks:
+            print(task.name)
 
 def set_current_task(session: Session, task_name: str):
     board = session.exec(select(Board).where(Board.is_selected == True)).first()

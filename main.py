@@ -83,11 +83,11 @@ def main():
     parser.add_argument('-rt', '--reset-token', action='store_true', help="Reset current token")
     parser.add_argument('-lo', '--list-organizations', action='store_true', help="List organizations")
     parser.add_argument('-o', '--organization', type=str, help="Set currently used organization")
-    parser.add_argument('-f', '--fetch', action='store_true',
-                        help="Fetch all organizations, boards, and tasks from Trello")
+    parser.add_argument('-f', '--fetch', action='store_true', help="Fetch all organizations, boards, and tasks from Trello")
     parser.add_argument('-lb', '--list-boards', action='store_true', help="List all boards in selected organization")
     parser.add_argument('-b', '--board', type=str, help="Set currently used board")
     parser.add_argument('-lt', '--list-tasks', action='store_true', help="List tasks in selected board")
+    parser.add_argument('-ltt', '--list-tasks-time', action='store_true', help="List tasks with time worked in selected board")
     parser.add_argument('-t', '--task', type=str, help="Set currently used task")
     parser.add_argument('-s', '--submit', action='store_true', help="Submit hours worked as a comment to the selected task on Trello")
     parser.add_argument('hours', nargs='?', type=str, help="Modify hours of the current task (e.g., +10 to add 10 hours, -5 to subtract 5 hours)")
@@ -138,6 +138,10 @@ def main():
 
         if args.list_tasks:
             list_tasks(session)
+            sys.exit(0)
+
+        if args.list_tasks_time:
+            list_tasks(session, show_time=True, worked=True)
             sys.exit(0)
 
         if args.task:
