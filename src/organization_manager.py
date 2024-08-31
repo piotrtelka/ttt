@@ -1,5 +1,7 @@
 from sqlalchemy import text
 from sqlmodel import select, Session
+
+from src.log import log
 from src.models import Organization, Board, Task
 from trello import TrelloClient
 
@@ -16,9 +18,9 @@ def set_current_organization(session: Session, org_name: str):
         organization.is_selected = True
         session.add(organization)
         session.commit()
-        print(f"Organization '{org_name}' is now the current organization.")
+        log(f"Organization '{org_name}' is now the current organization.")
     else:
-        print(f"Organization '{org_name}' not found.")
+        log(f"Organization '{org_name}' not found.")
 
 
 def fetch_and_store_data(client: TrelloClient, session: Session, cleanup=False):
@@ -54,7 +56,7 @@ def fetch_and_store_data(client: TrelloClient, session: Session, cleanup=False):
                             # remove tasks from db:
                             task = session.exec(select(Task).where(Task.trello_id == trello_task.id)).first()
                             if task:
-                                print(f"Removing task {task.name} from database. Hours worked: {task.hours_worked}")
+                                log(f"Removing task {task.name} from database. Hours worked: {task.hours_worked}")
                                 session.delete(task)
                                 session.commit()
                     continue
@@ -69,13 +71,13 @@ def fetch_and_store_data(client: TrelloClient, session: Session, cleanup=False):
                     session.add(task)
                     session.commit()
 
-    print("Fetched and stored all organizations, boards, and tasks.")
+    log("Fetched and stored all organizations, boards, and tasks.")
 
 
 def list_boards(session: Session):
     organization = session.exec(select(Organization).where(Organization.is_selected == True)).first()
     if not organization:
-        print("Error: No organization is selected.")
+        log("Error: No organization is selected.")
         return
     boards = session.exec(select(Board).where(Board.organization_id == organization.id)).all()
     for board in boards:
@@ -92,14 +94,14 @@ def set_current_board(session: Session, board_name: str):
         board.is_selected = True
         session.add(board)
         session.commit()
-        print(f"Board '{board_name}' is now the current board.")
+        log(f"Board '{board_name}' is now the current board.")
     else:
-        print(f"Board '{board_name}' not found in the selected organization.")
+        log(f"Board '{board_name}' not found in the selected organization.")
 
 def list_tasks(session: Session, show_time=False, worked=False):
     board = session.exec(select(Board).where(Board.is_selected == True)).first()
     if not board:
-        print("Error: No board is selected.")
+        log("Error: No board is selected.")
         return
     tasks = session.exec(select(Task).where(Task.board_id == board.id)).all()
     if worked:
@@ -124,9 +126,9 @@ def set_current_task(session: Session, task_name: str):
         task.is_selected = True
         session.add(task)
         session.commit()
-        print(f"Task '{task_name}' is now the current task.")
+        log(f"Task '{task_name}' is now the current task.")
     else:
-        print(f"Task '{task_name}' not found in the selected board.")
+        log(f"Task '{task_name}' not found in the selected board.")
 
 def modify_task_hours(session: Session, hours: int):
     task = session.exec(select(Task).where(Task.is_selected == True)).first()
@@ -138,14 +140,14 @@ def modify_task_hours(session: Session, hours: int):
         task.hours_worked = 0
     session.add(task)
     session.commit()
-    print(f"Task '{task.name}' now has {task.hours_worked} hours worked.")
+    log(f"Task '{task.name}' now has {task.hours_worked} hours worked.")
 
 def show_current_status(client: TrelloClient, session: Session):
     organization = session.exec(select(Organization).where(Organization.is_selected == True)).first()
     board = session.exec(select(Board).where(Board.is_selected == True)).first()
     task = session.exec(select(Task).where(Task.is_selected == True)).first()
 
-    print("Current Status:")
+    log("Current Status:")
     if organization:
         print(f"Organization: {organization.name}")
     else:

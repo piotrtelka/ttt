@@ -1,5 +1,7 @@
 from sqlalchemy import text
 from sqlmodel import select
+
+from src.log import log
 from src.models import User
 
 
@@ -18,10 +20,10 @@ def obtain_and_save_token(session, api_key):
     user = User(trello_token=token)
     session.add(user)
     session.commit()
-    print("Token saved successfully.")
+    log("Token saved successfully.")
     return token
 
 def reset_token(session):
     session.exec(text("DELETE FROM user"))
     session.commit()
-    print("Token has been reset.")
+    log("Token has been reset.")
