@@ -108,9 +108,13 @@ def list_tasks(session: Session, show_time=False, worked=False):
         tasks = session.exec(select(Task).where(Task.board_id == board.id).where(Task.hours_worked > 0)).all()
     if show_time:
         print("Hours".ljust(11) + "Task")
+        sum_h = 0
         for task in tasks:
+            sum_h += task.hours_worked
             hours_str = str(task.hours_worked).ljust(10)
             print(hours_str + " " + task.name)
+
+        print(f"\nTotal hours worked: {sum_h}")
     else:
         for task in tasks:
             print(task.name)
