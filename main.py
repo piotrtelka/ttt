@@ -50,13 +50,13 @@ def get_current_task_names():
 def submit_hours_to_trello(session, client):
     task = session.exec(select(Task).where(Task.is_selected == True)).first()
     if not task:
-        log("Error: No task is selected.")
+        print("Error: No task is selected.")
         return
 
     comment = f"Worked {task.hours_worked} hours on this task."
     trello_card = client.get_card(task.trello_id)
     trello_card.comment(comment)
-    log(f"Submitted comment to task '{task.name}': {comment}")
+    print(f"Submitted comment to task '{task.name}': {comment}")
     print(f"Link: https://trello.com/c/{task.trello_id}")
 
 
@@ -158,7 +158,7 @@ def main():
                 hours = int(args.hours)
                 modify_task_hours(session, hours)
             except ValueError:
-                log("Error: Hours must be a valid integer, prefixed with '+' or '-'.")
+                print("Error: Hours must be a valid integer, prefixed with '+' or '-'.")
             sys.exit(0)
 
         if args.submit:

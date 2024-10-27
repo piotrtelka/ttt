@@ -169,11 +169,11 @@ def show_current_status(client: TrelloClient, session: Session):
         if card.description and len(card.description) > 0:
             print("\n--- Task description ---:")
             print(card.description)
-            print("--- Task comments ---:")
 
         if len(card.comments) > 0:
+            print("\n--- Task comments ---:")
             for comment in card.comments:
-                print(comment)
+                print(f"{comment['date']}, {comment['memberCreator']['fullName']}: {comment['data']['text']}")
                 print("-\n")
     else:
         print("Task: None")
