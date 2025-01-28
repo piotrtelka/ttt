@@ -53,11 +53,14 @@ def submit_hours_to_trello(session, client):
         print("Error: No task is selected.")
         return
 
-    comment = f"Worked {task.hours_worked} hours on this task."
+    comment = f"Worked {task.hours_worked - task.submitted} hours on this task."
     trello_card = client.get_card(task.trello_id)
     trello_card.comment(comment)
     print(f"Submitted comment to task '{task.name}': {comment}")
     print(f"Link: https://trello.com/c/{task.trello_id}")
+    task.submitted += task.hours_worked - task.submitted
+    session.add(task)
+    session.commit()
 
 
 def completer(text, state):
@@ -166,7 +169,7 @@ def main():
             sys.exit(0)
 
         # If no arguments are provided, show the current status
-        show_current_status(client, session)
+        list_tasks(session, show_time=True, worked=True)
 
 
 if __name__ == "__main__":

@@ -107,11 +107,13 @@ def list_tasks(session: Session, show_time=False, worked=False):
     if worked:
         tasks = session.exec(select(Task).where(Task.board_id == board.id).where(Task.hours_worked > 0)).all()
     if show_time:
-        print("Hours".ljust(11) + "Task")
+        print("  Submitted".ljust(13) + "Hours".ljust(11) + "Task")
         sum_h = 0
         for task in tasks:
             sum_h += task.hours_worked
-            hours_str = str(task.hours_worked).ljust(10)
+            before = '> ' if task.is_selected else '  '
+            hours_str = before + str(task.submitted).ljust(11)
+            hours_str += str(task.hours_worked).ljust(10)
             print(hours_str + " " + task.name)
 
         print(f"\nTotal hours worked: {sum_h}")
@@ -142,6 +144,9 @@ def modify_task_hours(session: Session, hours: int):
     task.hours_worked += hours
     if task.hours_worked < 0:
         task.hours_worked = 0
+    if task.hours_worked < task.submitted:
+        task.submitted = task.hours_worked
+
     session.add(task)
     session.commit()
     log(f"Task '{task.name}' now has {task.hours_worked} hours worked.")
@@ -163,7 +168,7 @@ def show_current_status(client: TrelloClient, session: Session):
         print("Board: None")
 
     if task:
-        print(f"Task: {task.name}. Hours worked: {task.hours_worked}. Link: https://trello.com/c/{task.trello_id}")
+        print(f"Task: {task.name}. Hours worked: {task.hours_worked}. Hours submitted: {task.submitted}. Link: https://trello.com/c/{task.trello_id}")
 
         card = client.get_card(task.trello_id)
         if card.description and len(card.description) > 0:

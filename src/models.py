@@ -33,6 +33,7 @@ class Task(SQLModel, table=True):
     name: str
     is_selected: bool = Field(default=False)
     hours_worked: int = Field(default=0)
+    submitted: int = Field(default=0)
     board_id: Optional[int] = Field(default=None, foreign_key="board.id")
 
     board: Optional[Board] = Relationship(back_populates="tasks")
